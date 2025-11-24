@@ -88,22 +88,28 @@ public class BoardController {
     // 4. 게시글 수정 (Update) API - PUT /api/board/{id}
     // ===========================================
     @PutMapping("/{id}")
-    @ResponseBody // @Controller 상태에서 JSON 응답을 위해 사용
-    public ResponseEntity<BoardResponse> updateBoard(
-            @PathVariable Long id,
-            @RequestBody BoardRequest request,
+    // @ResponseBody // 리다이렉션을 위해 제거
+    public String updateBoard( // 반환 타입을 String으로 변경하여 리다이렉트 가능하게 함
+            @PathVariable Long id, // @RequestBody 제거! 폼 데이터(title, content)를 받기 위함.
+             BoardRequest request,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         try {
             String email = userDetails.getUsername();
-            BoardResponse response = boardService.updateBoard(id, request, email);
-            return ResponseEntity.ok(response);
+
+            // Service를 호출하여 게시글을 업데이트합니다.
+            boardService.updateBoard(id, request, email);
+
+            // ⭐️ 수정 성공 후, 해당 게시글의 상세 페이지로 리다이렉트합니다.
+            return "redirect:/board/" + id;
+
         } catch (AccessDeniedException e) {
-            // 권한이 없는 경우 403 Forbidden 응답 반환
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            // 권한이 없는 경우 (403 Forbidden)
+            // 리다이렉트 대신 에러 메시지를 보여주는 페이지로 보낼 수 있으나, 여기서는 상세 페이지로 리다이렉트 (추후 개선 가능)
+            return "redirect:/board/" + id + "?error=forbidden";
         } catch (NoSuchElementException e) {
-            // 게시글이 없는 경우 404 Not Found 응답 반환
-            return ResponseEntity.notFound().build();
+            // 게시글이 없는 경우 (404 Not Found)
+            return "redirect:/"; // 목록으로 리다이렉트
         }
     }
 
@@ -111,22 +117,24 @@ public class BoardController {
     // 5. 게시글 삭제 (Delete) API - DELETE /api/board/{id}
     // ===========================================
     @DeleteMapping("/{id}")
-    @ResponseBody // @Controller 상태에서 JSON 응답을 위해 사용
-    public ResponseEntity<Void> deleteBoard(
+    // @ResponseBody // 폼 제출 후 리다이렉트를 위해 @ResponseBody를 제거
+    public String deleteBoard( // 반환 타입을 String으로 변경
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         try {
             String email = userDetails.getUsername();
             boardService.deleteBoard(id, email);
-            // 삭제 성공 시 204 No Content 반환
-            return ResponseEntity.noContent().build();
+
+            // ⭐️ 삭제 성공 시, 목록 페이지로 리다이렉트
+            return "redirect:/";
+
         } catch (AccessDeniedException e) {
-            // 권한이 없는 경우 403 Forbidden 응답 반환
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            // 권한이 없는 경우 (403 Forbidden)
+            return "redirect:/board/" + id + "?error=denied";
         } catch (NoSuchElementException e) {
-            // 게시글이 없는 경우 404 Not Found 응답 반환
-            return ResponseEntity.notFound().build();
+            // 게시글이 없는 경우 (404 Not Found)
+            return "redirect:/";
         }
     }
 }
