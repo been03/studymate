@@ -1,12 +1,12 @@
 package com.studymate.studymate;
 
+import com.studymate.studymate.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.studymate.studymate.User;
-import com.studymate.studymate.UserRepository;
+import com.studymate.studymate.user.User;
 import com.studymate.studymate.dto.UserJoinRequest; // DTO 임포트 추가
 import com.studymate.studymate.dto.UserLoginRequest;
 
@@ -20,24 +20,23 @@ public class UserService {
     @Transactional // ⭐️ [2] DB 변경 작업에는 @Transactional 어노테이션을 추가하는 것이 좋음
     // 개별 String 대신 DTO 객체 하나를 받도록 변경
     public Long join(UserJoinRequest request) {
-        // 1. User 객체 생성 (데이터베이스에 저장할 모델)
-        User user = new User();
-        user.setEmail(request.getEmail()); // DTO에서 값 추출
+        // 1. 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        // DTO에서 받은 비밀번호를 암호화하여 저장합니다.
-        String rawPassword = request.getPassword();
-        String encodedPassword = passwordEncoder.encode(rawPassword);
-        user.setPassword(encodedPassword); // 암호화된 비밀번호 저장
+        // 2. User 객체 생성 (Setter 대신 Builder 패턴 사용)
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(encodedPassword) // 암호화된 비밀번호 사용
+                .nickname(request.getNickname())
+                .build();
 
-        user.setNickname(request.getNickname());
-
-        // 2. Repository를 통해 DB에 저장
+        // 3. Repository를 통해 DB에 저장
         userRepository.save(user);
 
-        // 3. 저장된 User의 ID 반환
         return user.getId();
     }
 
+    /* UserLoginRequest를 이용한 login 메서드 로직은 Spring Security가 담당하므로, 이제는 사용하지 않는 코드
     // 로그인 요청 처리
 // @Transactional을 붙이지 않습니다. (DB에 데이터를 변경하지 않고 조회만 하므로)
     public Long login(UserLoginRequest request) {
@@ -56,5 +55,5 @@ public class UserService {
         // 3. 인증 성공 시, 사용자 ID 반환 (실제 서비스에서는 JWT 토큰이나 세션 정보 등을 반환합니다.)
         return user.getId();
     }
-
+    */
 }

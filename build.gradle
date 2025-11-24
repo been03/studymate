@@ -30,6 +30,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'mysql:mysql-connector-java:8.0.33' // MySQL 커넥터 의존성
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    // Spring Security와 Thymeleaf 통합을 위한 의존성
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	compileOnly 'org.projectlombok:lombok' // Lombok 의존성 두 줄 필수
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j'
