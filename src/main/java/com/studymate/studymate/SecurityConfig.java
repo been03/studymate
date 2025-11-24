@@ -55,7 +55,7 @@ public class SecurityConfig {
 
                 // 요청에 대한 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/user", "/api/board").permitAll() // 해당 페이지 API는 모두 허용
+                        .requestMatchers("/","/login", "/user", "/api/board").permitAll() // 해당 페이지 API는 모두 허용
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증(로그인)이 필요
                 )
 
