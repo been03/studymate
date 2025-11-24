@@ -40,13 +40,13 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="board : ${boards}">
+        <tr th:each="board : ${boards.content}">
             <td th:text="${board.id}">1</td>
             <td>
-                <a th:href="@{/board/{id}(id=${board.id})}" th:text="${board.title}">테스트 제목입니다.</a>
+                <a th:href="@{/board/{id}(id=${board.id})}" th:text="${board.title}">게시글 제목</a>
             </td>
-            <td th:text="${board.authorEmail}">test@example.com</td>
-            <td th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}">2023-11-24 10:00</td>
+            <td th:text="${board.authorEmail}">author@email.com</td>
+            <td th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 10:00</td>
         </tr>
         </tbody>
     </table>
