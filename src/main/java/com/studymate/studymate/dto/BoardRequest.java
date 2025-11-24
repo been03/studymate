@@ -3,8 +3,10 @@ package com.studymate.studymate.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor // ⭐️ 기본 생성자
 @AllArgsConstructor // ⭐️ 모든 필드 포함 생성자
 public class BoardRequest {
