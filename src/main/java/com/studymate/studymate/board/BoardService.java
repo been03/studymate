@@ -58,16 +58,26 @@ public class BoardService {
     }
 
     // ===========================================
-    // 3. 게시글 목록 조회 (Read - List with Paging)
+    // 3. 게시글 목록 조회 및 검색 기능 통합
     // ===========================================
-    // Pageable 객체를 인자로 받아 페이징된 결과를 반환합니다.
-    public Page<BoardResponse> getAllBoards(Pageable pageable) {
-        // 1. BoardRepository에서 Page<Board> 형태로 데이터를 조회합니다.
-        Page<Board> boards = boardRepository.findAll(pageable);
+    public Page<BoardResponse> getAllBoards(String searchKeyword, Pageable pageable) { // searchKeyword 파라미터 추가
 
-        // 2. Page<Board>를 Page<BoardResponse>로 변환하여 반환합니다.
-        // map() 메서드를 사용하여 각 Board 엔티티를 BoardResponse DTO로 변환합니다.
-        return boards.map(BoardResponse::new);
+        Page<Board> boardPage;
+
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            // 검색 키워드가 있는 경우, 제목과 내용 모두 검색
+            boardPage = boardRepository.findByTitleContainingOrContentContaining(
+                    searchKeyword, // 제목 검색용 키워드
+                    searchKeyword, // 내용 검색용 키워드
+                    pageable
+            );
+        } else {
+            // 검색 키워드가 없는 경우, 전체 목록 조회
+            boardPage = boardRepository.findAll(pageable);
+        }
+
+        // DTO로 변환하여 반환
+        return boardPage.map(BoardResponse::new);
     }
 
     // ===========================================

@@ -69,18 +69,19 @@ public class BoardController {
     }
 
     // ===========================================
-    // 3. 게시글 목록 조회 (Read - List) API - GET /api/board
+    // 3. 게시글 목록 조회 및 검색 (Read - List) API - GET /api/board
     // ===========================================
     @GetMapping
-    @ResponseBody // @Controller 상태에서 JSON 응답을 위해 사용
+    @ResponseBody
     public ResponseEntity<Page<BoardResponse>> getAllBoards(
-            // ⭐️ @PageableDefault를 사용하여 기본값 설정
+            // ⭐️ 검색어 파라미터 추가 (필수 아님)
+            @RequestParam(required = false) String searchKeyword,
+
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        // BoardService를 호출하여 페이징된 게시글 목록을 조회합니다.
-        Page<BoardResponse> response = boardService.getAllBoards(pageable);
+        // ⭐️ Service 호출 시 검색 키워드 전달
+        Page<BoardResponse> response = boardService.getAllBoards(searchKeyword, pageable);
 
-        // HTTP 상태 코드 200 OK와 함께 응답을 반환합니다.
         return ResponseEntity.ok(response);
     }
 

@@ -10,27 +10,42 @@
 
 <body>
 <div class="container mt-5">
-    <h1 class="text-center mb-4">스터디메이트 게시판</h1>
+    <h1 class="text-center mb-4">
+        <a th:href="@{/}" class="text-decoration-none text-dark">스터디메이트 게시판</a>
+    </h1>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div sec:authorize="isAuthenticated()">
-            <span class="badge bg-primary">환영합니다!
-                <span sec:authentication="name">사용자 이메일</span>
-            </span>
-            <a class="btn btn-sm btn-outline-danger ms-3" onclick="document.getElementById('logout-form').submit();">로그아웃</a>
+    <div class="row mb-4 align-items-center">
 
-            <form id="logout-form" th:action="@{/logout}" method="post" style="display: none;"></form>
+        <div class="col-md-6 d-flex align-items-center justify-content-start">
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center me-2">
+                <span class="badge bg-secondary me-2"
+                      th:text="|환영합니다! ${#authentication.name}|">환영합니다! user@test.com</span>
+                <a th:href="@{/logout}" class="btn btn-outline-secondary btn-sm me-2">로그아웃</a>
+            </div>
 
-            <a th:href="@{/board/write}" class="btn btn-sm btn-success ms-2">글쓰기</a>
+            <div sec:authorize="!isAuthenticated()" class="d-flex align-items-center me-2">
+                <a th:href="@{/user}" class="btn btn-outline-danger btn-sm me-2">로그인</a>
+            </div>
+
+            <a th:href="@{/board/write}" class="btn btn-outline-primary btn-sm">글쓰기</a>
         </div>
 
-        <div sec:authorize="isAnonymous()">
-            <a th:href="@{/login}" class="btn btn-sm btn-primary">로그인</a>
-            <a th:href="@{/user}" class="btn btn-sm btn-secondary">회원가입</a>
+        <div class="col-md-6 d-flex justify-content-end">
+            <form action="/" method="get" class="d-flex align-items-center" style="max-width: 300px;">
+
+                <input type="text"
+                       name="searchKeyword"
+                       class="form-control form-control-sm me-2"
+                       placeholder="제목 또는 내용으로 검색"
+                       th:value="${param.searchKeyword}">
+
+                <button type="submit" class="btn btn-outline-success btn-sm text-nowrap">검색</button>
+            </form>
         </div>
     </div>
 
-    <table class="table table-striped table-hover">
+    <table class="table table-hover">
+
         <thead>
         <tr>
             <th>ID</th>
@@ -43,36 +58,38 @@
         <tr th:each="board : ${boards.content}">
             <td th:text="${board.id}">1</td>
             <td>
-                <a th:href="@{/board/{id}(id=${board.id})}" th:text="${board.title}">게시글 제목</a>
+                <a th:href="@{/board/{id}(id=${board.id}, page=${boards.number}, searchKeyword=${searchKeyword})}"
+                   th:text="${board.title}">게시글 제목</a>
             </td>
             <td th:text="${board.authorEmail}">author@email.com</td>
             <td th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 10:00</td>
         </tr>
         </tbody>
     </table>
+</div>
 
-    <div th:if="${boards.totalPages > 0}" class="d-flex justify-content-center">
-        <nav>
-            <ul class="pagination">
-                <li class="page-item" th:classappend="${boards.number == 0 ? 'disabled' : ''}">
-                    <a class="page-link" th:href="@{/(page=${boards.number - 1})}">이전</a>
-                </li>
 
-                <li class="page-item" th:each="i : ${#numbers.sequence(0, boards.totalPages - 1)}"
-                    th:classappend="${i == boards.number ? 'active' : ''}">
-                    <a class="page-link" th:href="@{/(page=${i})}" th:text="${i + 1}">1</a>
-                </li>
+<div class="d-flex justify-content-center mt-4">
+    <a th:href="@{/(page=${boards.number - 1}, size=${boards.size}, searchKeyword=${searchKeyword})}"
+       th:classappend="${boards.first} ? 'disabled'"
+       class="btn btn-light border btn-sm me-1">이전</a>
 
-                <li class="page-item" th:classappend="${boards.number == boards.totalPages - 1 ? 'disabled' : ''}">
-                    <a class="page-link" th:href="@{/(page=${boards.number + 1})}">다음</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
+    <th:block th:with="start=${(boards.number/5)*5}, end=${(start + 4 < boards.totalPages) ? start + 4 : boards.totalPages - 1}">
+        <a th:each="page : ${#numbers.sequence(start, end)}"
+           th:href="@{/(page=${page}, searchKeyword=${searchKeyword})}"
+           th:text="${page + 1}"
+           th:classappend="${page == boards.number} ? 'btn-primary' : 'btn-light border'"
+           class="btn btn-sm me-1"></a>
+    </th:block>
 
-    <div th:if="${boards.isEmpty()}" class="alert alert-info text-center">
-        등록된 게시글이 없습니다.
-    </div>
+    <a th:href="@{/(page=${boards.number + 1}, size=${boards.size}, searchKeyword=${searchKeyword})}"
+       th:classappend="${boards.last} ? 'disabled'"
+       class="btn btn-light border btn-sm">다음</a>
+</div>
+
+<div th:if="${boards.isEmpty()}" class="alert alert-info text-center">
+    등록된 게시글이 없습니다.
+</div>
 
 </div>
 </body>

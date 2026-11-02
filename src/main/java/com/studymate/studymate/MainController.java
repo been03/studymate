@@ -10,21 +10,27 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam; // @RequestParam 임포트
 
 @Controller
 @RequiredArgsConstructor
 public class MainController {
 
-    private final BoardService boardService; // ⭐️ BoardService 주입
+    private final BoardService boardService; // BoardService 주입
 
     // 루트 경로('/')로 접근 시, 게시글 목록을 가져와 index.html로 전달
     @GetMapping("/")
     public String index(
+            // searchKeyword 파라미터를 받도록 추가
+            @RequestParam(required = false) String searchKeyword,
             Model model, // View로 데이터를 전달하기 위해 Model 객체 사용
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        // BoardService를 통해 페이징된 BoardResponse DTO 목록을 가져옵니다.
-        model.addAttribute("boards", boardService.getAllBoards(pageable));
+        // Service 호출 시 searchKeyword 파라미터 전달
+        model.addAttribute("boards", boardService.getAllBoards(searchKeyword, pageable));
+
+        // 현재 검색어를 View에 다시 전달하여 검색창에 유지되도록 추가
+        model.addAttribute("searchKeyword", searchKeyword);
 
         return "index"; // index.html 템플릿 반환
     }

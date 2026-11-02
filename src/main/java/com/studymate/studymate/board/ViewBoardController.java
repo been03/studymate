@@ -3,6 +3,7 @@ package com.studymate.studymate.board;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam; // ⭐️ 추가
 import com.studymate.studymate.dto.BoardResponse; // BoardResponse 임포트 필요
 import lombok.RequiredArgsConstructor; // 주입을 위해 임포트
 import org.springframework.ui.Model; // Model 임포트 필요
@@ -23,17 +24,26 @@ public class ViewBoardController {
     }
 
     // ===============================================
-    // ⭐️ 게시글 상세 조회 View 기능 추가
+    // ⭐️ 게시글 상세 조회 View (검색 및 페이징 상태 보존)
     // GET /board/{id} 요청 처리
     // ===============================================
     @GetMapping("/{id}")
-    public String getBoardDetail(@PathVariable Long id, Model model) {
+    public String getBoardDetail(
+            @PathVariable Long id,
+            @RequestParam(required = false) Integer page,           // ⭐️ 추가: 현재 페이지 번호 수신
+            @RequestParam(required = false) String searchKeyword,   // ⭐️ 추가: 검색어 수신
+            Model model
+    ) {
         try {
             // Service를 호출하여 게시글 정보를 가져옵니다.
             BoardResponse board = boardService.getBoardById(id);
 
             // View로 전달할 데이터를 Model에 담습니다.
             model.addAttribute("board", board);
+
+            // ⭐️ 목록 복귀 시 사용할 상태값 저장
+            model.addAttribute("page", page);
+            model.addAttribute("searchKeyword", searchKeyword);
 
             // Thymeleaf 템플릿 경로: src/main/resources/templates/board/detail.html
             return "board/detail"; // ⭐️ detail.html 템플릿 반환
