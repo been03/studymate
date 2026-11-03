@@ -20,6 +20,11 @@ public class UserService {
     @Transactional // ⭐️ [2] DB 변경 작업에는 @Transactional 어노테이션을 추가하는 것이 좋음
     // 개별 String 대신 DTO 객체 하나를 받도록 변경
     public Long join(UserJoinRequest request) {
+        // ⭐️ 0. 이메일 중복 검증 (이미 가입된 이메일인 경우 예외 발생)
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        }
+
         // 1. 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
