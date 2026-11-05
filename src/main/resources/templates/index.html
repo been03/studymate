@@ -22,6 +22,12 @@
                 <span class="badge bg-secondary me-2"
                       th:text="|환영합니다! ${#authentication.name}|">환영합니다! user@test.com</span>
                 <a th:href="@{/logout}" class="btn btn-outline-secondary btn-sm me-2">로그아웃</a>
+
+                <!-- ⭐️ 회원탈퇴 폼 (POST /user/withdraw) -->
+                <form th:action="@{/user/withdraw}" method="post" class="m-0 me-2"
+                      onsubmit="return confirm('정말 탈퇴하시겠습니까?\n작성하신 게시글은 유지되지만, 동일 계정으로 재로그인이 불가능합니다.');">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">회원탈퇴</button>
+                </form>
             </div>
 
             <div sec:authorize="!isAuthenticated()" class="d-flex align-items-center me-2">
@@ -31,7 +37,7 @@
             <a th:href="@{/board/write}" class="btn btn-outline-primary btn-sm">글쓰기</a>
         </div>
 
-        <!-- 우측: ⭐️ 조건 드롭다운이 추가된 검색 폼 -->
+        <!-- 우측: 조건 드롭다운이 추가된 검색 폼 -->
         <div class="col-md-7 d-flex justify-content-end">
             <form action="/" method="get" class="d-flex align-items-center" style="max-width: 420px; width: 100%;">
 
@@ -68,7 +74,7 @@
         <tr th:each="board : ${boards.content}">
             <td th:text="${board.id}">1</td>
             <td>
-                <!-- ⭐️ searchType도 링크 파라미터로 함께 전달 -->
+                <!-- searchType도 링크 파라미터로 함께 전달 -->
                 <a th:href="@{/board/{id}(id=${board.id}, page=${boards.number}, searchType=${searchType}, searchKeyword=${searchKeyword})}"
                    th:text="${board.title}">게시글 제목</a>
             </td>
@@ -78,7 +84,7 @@
         </tbody>
     </table>
 
-    <!-- ⭐️ 페이징 영역 (searchType 조건 유지) -->
+    <!-- 페이징 영역 (searchType 조건 유지) -->
     <div class="d-flex justify-content-center mt-4">
         <a th:href="@{/(page=${boards.number - 1}, size=${boards.size}, searchType=${searchType}, searchKeyword=${searchKeyword})}"
            th:classappend="${boards.first} ? 'disabled'"

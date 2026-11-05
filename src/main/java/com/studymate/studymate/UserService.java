@@ -41,6 +41,15 @@ public class UserService {
         return user.getId();
     }
 
+    // ⭐️ 회원 탈퇴 비즈니스 로직 추가 (Soft Delete)
+    @Transactional
+    public void withdraw(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        user.withdraw();
+    }
+
     /* UserLoginRequest를 이용한 login 메서드 로직은 Spring Security가 담당하므로, 이제는 사용하지 않는 코드
     // 로그인 요청 처리
 // @Transactional을 붙이지 않습니다. (DB에 데이터를 변경하지 않고 조회만 하므로)

@@ -26,6 +26,17 @@ public class User {
 
     private String nickname;
 
+    // ⭐️ 1. 탈퇴 여부 플래그 (기본값: false / 정상 회원)
+    // @Builder 사용 시 기본값 보존을 위해 @Builder.Default 지정
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean isDeleted = false;
+
+    // ⭐️ 2. 회원 탈퇴 비즈니스 메서드 (Soft Delete)
+    public void withdraw() {
+        this.isDeleted = true;
+    }
+
     // ⭐️ 참고: 프로젝트 초기에는 Getter, Setter만 있어도 작동하지만,
     // JPA의 안정적인 사용을 위해 NoArgsConstructor, AllArgsConstructor, Builder를 사용하는 것이 좋습니다.
 
@@ -34,11 +45,10 @@ public class User {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(this.email) // UserDetails의 username은 우리의 email을 사용합니다.
                 .password(this.password)
+                // ⭐️ 3. 탈퇴 회원은 로그인 불가하도록 비활성화 처리 (isDeleted가 true면 disabled=true)
+                .disabled(this.isDeleted)
                 // ⭐️최소한의 권한 ROLE_USER를 부여합니다.
                 .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")))
                 .build();
     }
-
-
 }
-
