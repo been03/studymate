@@ -74,13 +74,13 @@ public class BoardController {
     @GetMapping
     @ResponseBody
     public ResponseEntity<Page<BoardResponse>> getAllBoards(
-            // ⭐️ 검색어 파라미터 추가 (필수 아님)
+            // ⭐️ searchType 파라미터 추가 (기본값 설정)
+            @RequestParam(required = false, defaultValue = "titleOrContent") String searchType,
             @RequestParam(required = false) String searchKeyword,
-
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        // ⭐️ Service 호출 시 검색 키워드 전달
-        Page<BoardResponse> response = boardService.getAllBoards(searchKeyword, pageable);
+        // ⭐️ searchType도 함께 Service로 전달
+        Page<BoardResponse> response = boardService.getAllBoards(searchType, searchKeyword, pageable);
 
         return ResponseEntity.ok(response);
     }

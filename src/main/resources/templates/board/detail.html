@@ -21,7 +21,7 @@
     </div>
 
     <div class="d-flex justify-content-between">
-        <a th:href="@{/(page=${page}, searchKeyword=${searchKeyword})}" class="btn btn-secondary">목록</a>
+        <a th:href="@{/(page=${page}, searchType=${searchType}, searchKeyword=${searchKeyword})}" class="btn btn-secondary">목록</a>
 
         <div sec:authorize="isAuthenticated()">
             <th:block th:if="${board.authorEmail == #authentication.name}">

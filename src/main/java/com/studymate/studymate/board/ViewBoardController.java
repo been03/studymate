@@ -24,13 +24,14 @@ public class ViewBoardController {
     }
 
     // ===============================================
-    // ⭐️ 게시글 상세 조회 View (try-catch 제거 -> @ControllerAdvice에 위임)
+    // ⭐️ 게시글 상세 조회 View (검색 유형, 키워드, 페이징 상태 보존)
     // GET /board/{id}
     // ===============================================
     @GetMapping("/{id}")
     public String getBoardDetail(
             @PathVariable Long id,
             @RequestParam(required = false) Integer page,           // 현재 페이지 번호 수신
+            @RequestParam(required = false) String searchType,    // ⭐️ 추가: 검색 조건 수신
             @RequestParam(required = false) String searchKeyword,   // 검색어 수신
             Model model
     ) {
@@ -43,6 +44,7 @@ public class ViewBoardController {
 
         // 목록 복귀 시 사용할 상태값 저장
         model.addAttribute("page", page);
+        model.addAttribute("searchType", searchType);       // ⭐️ 추가: 목록 복귀 시 사용할 상태값 저장
         model.addAttribute("searchKeyword", searchKeyword);
 
         // Thymeleaf 템플릿 경로: src/main/resources/templates/board/detail.html

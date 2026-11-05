@@ -16,7 +16,8 @@
 
     <div class="row mb-4 align-items-center">
 
-        <div class="col-md-6 d-flex align-items-center justify-content-start">
+        <!-- 좌측: 인증 상태 및 글쓰기 버튼 -->
+        <div class="col-md-5 d-flex align-items-center justify-content-start">
             <div sec:authorize="isAuthenticated()" class="d-flex align-items-center me-2">
                 <span class="badge bg-secondary me-2"
                       th:text="|환영합니다! ${#authentication.name}|">환영합니다! user@test.com</span>
@@ -24,28 +25,37 @@
             </div>
 
             <div sec:authorize="!isAuthenticated()" class="d-flex align-items-center me-2">
-                <a th:href="@{/user}" class="btn btn-outline-danger btn-sm me-2">로그인</a>
+                <a th:href="@{/login}" class="btn btn-outline-danger btn-sm me-2">로그인</a>
             </div>
 
             <a th:href="@{/board/write}" class="btn btn-outline-primary btn-sm">글쓰기</a>
         </div>
 
-        <div class="col-md-6 d-flex justify-content-end">
-            <form action="/" method="get" class="d-flex align-items-center" style="max-width: 300px;">
+        <!-- 우측: ⭐️ 조건 드롭다운이 추가된 검색 폼 -->
+        <div class="col-md-7 d-flex justify-content-end">
+            <form action="/" method="get" class="d-flex align-items-center" style="max-width: 420px; width: 100%;">
 
+                <!-- 검색 조건 드롭다운 (선택 상태 유지: th:selected) -->
+                <select name="searchType" class="form-select form-select-sm me-2" style="width: 130px;">
+                    <option value="titleOrContent" th:selected="${searchType == 'titleOrContent'}">제목+내용</option>
+                    <option value="title" th:selected="${searchType == 'title'}">제목</option>
+                    <option value="content" th:selected="${searchType == 'content'}">내용</option>
+                </select>
+
+                <!-- 검색어 입력창 -->
                 <input type="text"
                        name="searchKeyword"
                        class="form-control form-control-sm me-2"
-                       placeholder="제목 또는 내용으로 검색"
-                       th:value="${param.searchKeyword}">
+                       placeholder="검색어를 입력하세요"
+                       th:value="${searchKeyword}">
 
                 <button type="submit" class="btn btn-outline-success btn-sm text-nowrap">검색</button>
             </form>
         </div>
     </div>
 
+    <!-- 게시글 테이블 -->
     <table class="table table-hover">
-
         <thead>
         <tr>
             <th>ID</th>
@@ -58,7 +68,8 @@
         <tr th:each="board : ${boards.content}">
             <td th:text="${board.id}">1</td>
             <td>
-                <a th:href="@{/board/{id}(id=${board.id}, page=${boards.number}, searchKeyword=${searchKeyword})}"
+                <!-- ⭐️ searchType도 링크 파라미터로 함께 전달 -->
+                <a th:href="@{/board/{id}(id=${board.id}, page=${boards.number}, searchType=${searchType}, searchKeyword=${searchKeyword})}"
                    th:text="${board.title}">게시글 제목</a>
             </td>
             <td th:text="${board.authorEmail}">author@email.com</td>
@@ -66,30 +77,29 @@
         </tr>
         </tbody>
     </table>
-</div>
 
+    <!-- ⭐️ 페이징 영역 (searchType 조건 유지) -->
+    <div class="d-flex justify-content-center mt-4">
+        <a th:href="@{/(page=${boards.number - 1}, size=${boards.size}, searchType=${searchType}, searchKeyword=${searchKeyword})}"
+           th:classappend="${boards.first} ? 'disabled'"
+           class="btn btn-light border btn-sm me-1">이전</a>
 
-<div class="d-flex justify-content-center mt-4">
-    <a th:href="@{/(page=${boards.number - 1}, size=${boards.size}, searchKeyword=${searchKeyword})}"
-       th:classappend="${boards.first} ? 'disabled'"
-       class="btn btn-light border btn-sm me-1">이전</a>
+        <th:block th:with="start=${(boards.number/5)*5}, end=${(start + 4 < boards.totalPages) ? start + 4 : boards.totalPages - 1}">
+            <a th:each="page : ${#numbers.sequence(start, end)}"
+               th:href="@{/(page=${page}, searchType=${searchType}, searchKeyword=${searchKeyword})}"
+               th:text="${page + 1}"
+               th:classappend="${page == boards.number} ? 'btn-primary' : 'btn-light border'"
+               class="btn btn-sm me-1"></a>
+        </th:block>
 
-    <th:block th:with="start=${(boards.number/5)*5}, end=${(start + 4 < boards.totalPages) ? start + 4 : boards.totalPages - 1}">
-        <a th:each="page : ${#numbers.sequence(start, end)}"
-           th:href="@{/(page=${page}, searchKeyword=${searchKeyword})}"
-           th:text="${page + 1}"
-           th:classappend="${page == boards.number} ? 'btn-primary' : 'btn-light border'"
-           class="btn btn-sm me-1"></a>
-    </th:block>
+        <a th:href="@{/(page=${boards.number + 1}, size=${boards.size}, searchType=${searchType}, searchKeyword=${searchKeyword})}"
+           th:classappend="${boards.last} ? 'disabled'"
+           class="btn btn-light border btn-sm">다음</a>
+    </div>
 
-    <a th:href="@{/(page=${boards.number + 1}, size=${boards.size}, searchKeyword=${searchKeyword})}"
-       th:classappend="${boards.last} ? 'disabled'"
-       class="btn btn-light border btn-sm">다음</a>
-</div>
-
-<div th:if="${boards.isEmpty()}" class="alert alert-info text-center">
-    등록된 게시글이 없습니다.
-</div>
+    <div th:if="${boards.isEmpty()}" class="alert alert-info text-center mt-3">
+        등록된 게시글이 없습니다.
+    </div>
 
 </div>
 </body>

@@ -58,24 +58,33 @@ public class BoardService {
     }
 
     // ===========================================
-    // 3. 게시글 목록 조회 및 검색 기능 통합
+    // 3. 게시글 목록 조회 및 조건별 검색 기능
     // ===========================================
-    public Page<BoardResponse> getAllBoards(String searchKeyword, Pageable pageable) { // searchKeyword 파라미터 추가
+    public Page<BoardResponse> getAllBoards(String searchType, String searchKeyword, Pageable pageable) {
 
         Page<Board> boardPage;
 
+        // 검색어가 비어있지 않은 경우
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            // 검색 키워드가 있는 경우, 제목과 내용 모두 검색
-            boardPage = boardRepository.findByTitleContainingOrContentContaining(
-                    searchKeyword, // 제목 검색용 키워드
-                    searchKeyword, // 내용 검색용 키워드
-                    pageable
-            );
+            // searchType이 null이거나 기본값일 경우 "titleOrContent"로 처리
+            String type = (searchType != null && !searchType.trim().isEmpty()) ? searchType : "titleOrContent";
+
+            switch (type) {
+                case "title": // 제목만 검색
+                    boardPage = boardRepository.findByTitleContaining(searchKeyword, pageable);
+                    break;
+                case "content": // 내용만 검색
+                    boardPage = boardRepository.findByContentContaining(searchKeyword, pageable);
+                    break;
+                case "titleOrContent": // 제목 + 내용 검색
+                default:
+                    boardPage = boardRepository.findByTitleContainingOrContentContaining(searchKeyword, searchKeyword, pageable);
+                    break;
+            }
         } else {
-            // 검색 키워드가 없는 경우, 전체 목록 조회
+            // 검색어가 없으면 전체 목록 조회
             boardPage = boardRepository.findAll(pageable);
         }
-
         // DTO로 변환하여 반환
         return boardPage.map(BoardResponse::new);
     }
