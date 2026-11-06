@@ -31,7 +31,9 @@ public class Board {
     @Column(updatable = false) // ⭐️ 생성일자는 업데이트되지 않음
     private LocalDateTime createdAt; // 생성 일시
 
-    // 조회수 등의 필드는 필요에 따라 추가할 수 있습니다.
+    // ⭐️ 1. 조회수 필드 추가 (기본값 0)
+    @Column(nullable = false)
+    private int viewCount = 0;
 
     @Builder
     public Board(String title, String content, User author) {
@@ -39,6 +41,7 @@ public class Board {
         this.content = content;
         this.author = author;
         this.createdAt = LocalDateTime.now();
+        this.viewCount = 0; // ⭐️ 2. 신규 글 생성 시 조회수는 0으로 세팅
     }
 
     // ⭐️ 게시글 수정을 위한 메서드

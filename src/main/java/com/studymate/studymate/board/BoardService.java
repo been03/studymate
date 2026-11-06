@@ -129,4 +129,12 @@ public class BoardService {
         // 3. DB에서 삭제
         boardRepository.delete(board);
     }
+
+    // ===========================================
+    // 조회수 증가 로직
+    // ===========================================
+    @Transactional
+    public void incrementViewCount(Long id) {
+        boardRepository.updateViewCount(id);
+    }
 }

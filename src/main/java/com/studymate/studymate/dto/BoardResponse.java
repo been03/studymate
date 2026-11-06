@@ -12,6 +12,7 @@ public class BoardResponse {
     private final String content;   // 내용
     private final String authorEmail; // ⭐️ 작성자의 이메일 (작성자 식별용)
     private final LocalDateTime createdAt; // 작성 일시
+    private final int viewCount;    // ⭐️ 추가: 조회수
 
     // Board 엔티티를 받아 Response DTO로 변환하는 생성자
     public BoardResponse(Board board) {
@@ -21,5 +22,6 @@ public class BoardResponse {
         // ⭐️ N:1 관계를 통해 Board 엔티티의 author(User) 정보에서 이메일을 가져옵니다.
         this.authorEmail = board.getAuthor().getEmail();
         this.createdAt = board.getCreatedAt();
+        this.viewCount = board.getViewCount(); // ⭐️ 추가: 엔티티의 조회수 매핑
     }
 }

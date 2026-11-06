@@ -64,22 +64,23 @@
     <table class="table table-hover">
         <thead>
         <tr>
-            <th>ID</th>
+            <th class="text-center" style="width: 8%;">ID</th>
             <th>제목</th>
-            <th>작성자</th>
-            <th>작성일</th>
+            <th style="width: 25%;">작성자</th>
+            <th class="text-center" style="width: 10%;">조회수</th>  <!-- ⭐️ 1. 헤더에 조회수 컬럼 추가 -->
+            <th class="text-center" style="width: 20%;">작성일</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="board : ${boards.content}">
-            <td th:text="${board.id}">1</td>
+            <td class="text-center" th:text="${board.id}">1</td>
             <td>
-                <!-- searchType도 링크 파라미터로 함께 전달 -->
                 <a th:href="@{/board/{id}(id=${board.id}, page=${boards.number}, searchType=${searchType}, searchKeyword=${searchKeyword})}"
                    th:text="${board.title}">게시글 제목</a>
             </td>
             <td th:text="${board.authorEmail}">author@email.com</td>
-            <td th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 10:00</td>
+            <td class="text-center" th:text="${board.viewCount}">0</td> <!-- ⭐️ 2. 본문에 조회수 값 출력 바인딩 -->
+            <td class="text-center" th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 10:00</td>
         </tr>
         </tbody>
     </table>

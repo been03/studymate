@@ -11,9 +11,15 @@
     <h1 class="text-center mb-4" th:text="${board.title}">게시글 제목</h1>
 
     <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <!-- 왼쪽 배치 -->
             <span th:text="|작성자: ${board.authorEmail}|">작성자: author@email.com</span>
-            <span th:text="|작성일: ${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}|">작성일: 2023-01-01</span>
+
+            <!-- 오른쪽 배치 (조회수 + 작성일을 한 묶음으로 처리) -->
+            <div>
+                <span class="text-secondary me-3" th:text="|조회수: ${board.viewCount}|">조회수: 0</span>
+                <span th:text="|작성일: ${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}|">작성일: 2023-01-01</span>
+            </div>
         </div>
         <div class="card-body">
             <p class="card-text" style="white-space: pre-wrap;" th:text="${board.content}">게시글 내용</p>
