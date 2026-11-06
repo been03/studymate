@@ -84,25 +84,33 @@
         </tbody>
     </table>
 
-    <!-- 페이징 영역 (searchType 조건 유지) -->
-    <div class="d-flex justify-content-center mt-4">
+    <!-- ⭐️ 게시글이 1건 이상 존재할 때만 페이징 네비게이션 표시 -->
+    <div th:if="${!boards.isEmpty()}" class="d-flex justify-content-center mt-4">
+
+        <!-- 이전 버튼 -->
         <a th:href="@{/(page=${boards.number - 1}, size=${boards.size}, searchType=${searchType}, searchKeyword=${searchKeyword})}"
            th:classappend="${boards.first} ? 'disabled'"
            class="btn btn-light border btn-sm me-1">이전</a>
 
-        <th:block th:with="start=${(boards.number/5)*5}, end=${(start + 4 < boards.totalPages) ? start + 4 : boards.totalPages - 1}">
+        <!-- 5개 단위 윈도우 페이징 번호 -->
+        <th:block th:with="
+        start=${(boards.number / 5) * 5},
+        end=${(start + 4 < boards.totalPages) ? start + 4 : boards.totalPages - 1}">
+
             <a th:each="page : ${#numbers.sequence(start, end)}"
                th:href="@{/(page=${page}, searchType=${searchType}, searchKeyword=${searchKeyword})}"
                th:text="${page + 1}"
                th:classappend="${page == boards.number} ? 'btn-primary' : 'btn-light border'"
-               class="btn btn-sm me-1"></a>
+               class="btn btn-sm me-1">1</a>
         </th:block>
 
+        <!-- 다음 버튼 -->
         <a th:href="@{/(page=${boards.number + 1}, size=${boards.size}, searchType=${searchType}, searchKeyword=${searchKeyword})}"
            th:classappend="${boards.last} ? 'disabled'"
            class="btn btn-light border btn-sm">다음</a>
     </div>
 
+    <!-- 게시글이 없을 때 알림 -->
     <div th:if="${boards.isEmpty()}" class="alert alert-info text-center mt-3">
         등록된 게시글이 없습니다.
     </div>
